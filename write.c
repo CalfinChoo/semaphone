@@ -1,23 +1,26 @@
 #include "semaphone.h"
 
+int writ();
+int shmd, semd;
+struct sembuf sb;
+
+
 int main() {
+  sb.sem_num = 0;
+  sb.sem_op = -1;
   printf("trying to get in...\n");
-  write();
+  writ();
   return 0;
 }
 
-int write() {
-  sem_wait(&sem);
-  char * data = shmat(shmd, 0, 0);
-  // char previous[1024];
+int writ() {
+  semd = semget(KEY, 1, 0);
+  semop(semd, &sb, 1);
+  shmd = shmget(KEY, sizeof(char *), 0);
   int fd = open("story.txt", O_RDWR, 0666);
-  int r = read(fd, data, sizeof(data));
-  if (r < 0) {
-    printf("READ errno: %d, error message: %s", errno, strerror(errno));
-    return errno;
-  }
-  printf("Last addition: %s\n\n", previous);
-  // char input[1024];
+  char * data = shmget(KEY, 0, 0);
+  printf("Last addition: %s\n\n", data);
+  char input[1024];
   printf("Your addition: ");
   fgets(input, sizeof(input) - 1, stdin);
   int w = write(fd, input, sizeof(input));
@@ -25,13 +28,8 @@ int write() {
     printf("WRITE errno: %d, error message: %s", errno, strerror(errno));
     return errno;
   }
-  r = read(fd, data, sizeof(data));
-  if (r < 0) {
-    printf("READ errno: %d, error message: %s", errno, strerror(errno));
-    return errno;
-  }
   shmdt(data);
-  shmctl(shmd, IPC_RMID, 0);
-  sem_post(&sem);
+  semop(semd, &sb, 1);
+  sb.sem_op = 1;
   return 0;
 }

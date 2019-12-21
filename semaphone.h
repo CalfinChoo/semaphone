@@ -11,8 +11,12 @@
 #define KEY 12345
 #endif
 
-int shmd = -1;
-sem_t sem;
+union semun {
+	Int val;		// Value for SETVAL
+	Struct semid_ds *buf;		//Buffer for IPC_STAT, IPC_SET
+	Unsigned short *array;	//Array for GETALL, SETALL
+	Struct seminfo *__buf;	//Buffer for IPC_INFO (Linux-specific)
+};
 
 int control(char ** flag);
 int write();
