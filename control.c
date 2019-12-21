@@ -3,10 +3,10 @@
 int shmd, semd;
 union semun su;
 struct sembuf sb;
-int control(char ** flag);
+int control(char * flag);
 
 int main(int argc, char *argv[]) {
-  s.val = 1;
+  su.val = 1;
   sb.sem_num = 0;
   sb.sem_op = -1;
   if (argc == 1) {
@@ -30,10 +30,7 @@ int control(char * flag) {
   else if (strcmp(flag, "-r") == 0) {
     semop(semd, &sb, 1);
     shmd = shmget(KEY, sizeof(char *), 0);
-    while (shmd < 0) {
-      shmd = shmget(KEY, sizeof(char *), 0);
-    }
-    char * data;
+    char * data = calloc(1000, sizeof(char));
     int fd = open("story.txt", O_RDWR, 0666);
     int r = read(fd, data, sizeof(data));
     printf("The story so far:\n %s", data);

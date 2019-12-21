@@ -18,7 +18,7 @@ int writ() {
   semop(semd, &sb, 1);
   shmd = shmget(KEY, sizeof(char *), 0);
   int fd = open("story.txt", O_RDWR, 0666);
-  char * data = shmget(KEY, 0, 0);
+  char * data = shmat(shmd, 0, 0);
   printf("Last addition: %s\n\n", data);
   char input[1024];
   printf("Your addition: ");
