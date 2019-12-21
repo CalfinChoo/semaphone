@@ -17,7 +17,7 @@ int main() {
    printf("ERROR: %s\n", strerror(errno));
    return 1;
   }
-  int fd = open("story.txt", O_RDWR, 0666);
+  int fd = open("story.txt", O_WRONLY, 0666);
   char * data = shmat(shmd, 0, 0);
   printf("Last addition: %s\n\n", data);
   char input[1024];
@@ -30,7 +30,7 @@ int main() {
   }
   strcpy(data, input);
   shmdt(data);
-  semop(semd, &sb, 1);
   sb.sem_op = 1;
+  semop(semd, &sb, 1);
   return 0;
 }
