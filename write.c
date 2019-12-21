@@ -15,8 +15,16 @@ int main() {
 
 int writ() {
   semd = semget(KEY, 1, 0);
+  if(semd < 0){
+   printf("ERROR: %s\n", strerror(errno));
+   return 1;
+  }
   semop(semd, &sb, 1);
   shmd = shmget(KEY, sizeof(char *), 0);
+  if(shmd < 0){
+   printf("ERROR: %s\n", strerror(errno));
+   return 1;
+  }
   int fd = open("story.txt", O_RDWR, 0666);
   char * data = shmat(shmd, 0, 0);
   printf("Last addition: %s\n\n", data);
@@ -25,7 +33,7 @@ int writ() {
   fgets(input, sizeof(input) - 1, stdin);
   int w = write(fd, input, sizeof(input));
   if (w < 0) {
-    printf("WRITE errno: %d, error message: %s", errno, strerror(errno));
+    printf("ERROR: %d, error message: %s", errno, strerror(errno));
     return errno;
   }
   strcpy(data, input);

@@ -19,23 +19,41 @@ int main(int argc, char *argv[]) {
 
 int control(char * flag) {
   if (strcmp(flag, "-c") == 0) {
-    semd = semget(KEY, 1, IPC_CREAT | 0640);
+    semd = semget(KEY, 1, IPC_CREAT | 0644);
+    if(semd < 0){
+     printf("ERROR: %s\n", strerror(errno));
+     return 1;
+    }
     printf("semaphore created\n");
-    shmd = shmget(IPC_PRIVATE, sizeof(char *), IPC_CREAT | 0640);
+    shmd = shmget(IPC_PRIVATE, sizeof(char *), IPC_CREAT | 0644);
+    if(shmd < 0){
+     printf("ERROR: %s\n", strerror(errno));
+     return 1;
+    }
     printf("shared memory created\n");
     FILE * f = fopen("story.txt", "w");
     printf("file created\n");
     fclose(f);
   }
   else if (strcmp(flag, "-r") == 0) {
+    semd = semget(KEY, 1, 0);
+    if(semd < 0){
+     printf("ERROR: %s\n", strerror(errno));
+     return 1;
+    }
     semop(semd, &sb, 1);
     shmd = shmget(KEY, sizeof(char *), 0);
+    if(shmd < 0){
+     printf("ERROR: %s\n", strerror(errno));
+     return 1;
+    }
     char * data = calloc(1000, sizeof(char));
     int fd = open("story.txt", O_RDWR, 0666);
     int r = read(fd, data, sizeof(data));
     printf("The story so far:\n %s", data);
     shmctl(shmd, IPC_RMID, 0);
     semctl(semd, IPC_RMID, 0);
+    remove("story.txt");
   }
   else if (strcmp(flag, "-v") == 0) {
     char * data = calloc(1000, sizeof(char));
