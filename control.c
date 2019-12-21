@@ -1,9 +1,10 @@
 #include "semaphone.h"
 
+int shmd, semd;
+union semun su;
+struct sembuf sb;
+
 int main(int argc, char *argv[]) {
-  int shmd, semd;
-  union semun su;
-  struct sembuf sb;
   su.val = 1;
   sb.sem_num = 0;
   sb.sem_op = -1;
@@ -11,7 +12,11 @@ int main(int argc, char *argv[]) {
     printf("ERROR: You need to include a flag.\n");
     return 0;
   }
-  char * flag = argv[1];
+  else control(argv[1]);
+  return 0;
+}
+
+int control(char * flag) {
   if (strcmp(flag, "-c") == 0) {
     semd = semget(KEY, 1, IPC_CREAT | 0644);
     if(semd < 0){
@@ -20,7 +25,7 @@ int main(int argc, char *argv[]) {
     }
     printf("semaphore created\n");
     semctl(semd, 0, SETVAL, su);
-    shmd = shmget(IPC_PRIVATE, sizeof(char *), IPC_CREAT | 0644);
+    shmd = shmget(KEY, SIZE, IPC_CREAT | 0644);
     if(shmd < 0){
      printf("ERROR2: %s\n", strerror(errno));
      return 1;
@@ -37,7 +42,7 @@ int main(int argc, char *argv[]) {
      return 1;
     }
     semop(semd, &sb, 1);
-    shmd = shmget(KEY, sizeof(char *), 0);
+    shmd = shmget(KEY, SIZE, 0);
     if(shmd < 0){
      printf("ERROR2: %s\n", strerror(errno));
      return 1;
