@@ -17,19 +17,25 @@ int main() {
    printf("ERROR: %s\n", strerror(errno));
    return 1;
   }
-  int fd = open("story.txt", O_WRONLY, 0666);
+  FILE * f = fopen("story", "a");
   char * data = shmat(shmd, 0, 0);
   printf("Last addition: %s\n\n", data);
-  char input[1024];
+  char input[SIZE];
   printf("Your addition: ");
-  fgets(input, sizeof(input) - 1, stdin);
-  int w = write(fd, input, sizeof(input));
-  if (w < 0) {
-    printf("ERROR: %d, error message: %s", errno, strerror(errno));
-    return errno;
+  fgets(input, sizeof(input), stdin);
+  for (int i = 0; i < sizeof(input); i++) {
+    if (input[i] == '\n') {
+      input[i] = '\0';
+      break;
+    }
   }
+  fprintf(f, "%s\n", input);
+  fclose(f);
   strcpy(data, input);
-  shmdt(data);
+ if(shmdt(data) < 0){
+    printf("ERROR! Couldn't detatch shared memory segment: %s\n", strerror(errno));
+    return 1;
+  }
   sb.sem_op = 1;
   semop(semd, &sb, 1);
   return 0;

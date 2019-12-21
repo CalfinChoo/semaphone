@@ -3,6 +3,7 @@
 int shmd, semd;
 union semun su;
 struct sembuf sb;
+int control(char * flag);
 
 int main(int argc, char *argv[]) {
   su.val = 1;
@@ -25,13 +26,13 @@ int control(char * flag) {
     }
     printf("semaphore created\n");
     semctl(semd, 0, SETVAL, su);
-    shmd = shmget(KEY, SIZE, IPC_CREAT | 0644);
+    shmd = shmget(KEY, sizeof(char *), IPC_CREAT | 0644);
     if(shmd < 0){
      printf("ERROR2: %s\n", strerror(errno));
      return 1;
     }
     printf("shared memory created\n");
-    FILE * f = fopen("story.txt", "w");
+    FILE * f = fopen("story", "w");
     printf("file created\n");
     fclose(f);
   }
@@ -42,25 +43,34 @@ int control(char * flag) {
      return 1;
     }
     semop(semd, &sb, 1);
-    shmd = shmget(KEY, SIZE, 0);
+    shmd = shmget(KEY, sizeof(char *), 0);
     if(shmd < 0){
      printf("ERROR2: %s\n", strerror(errno));
      return 1;
     }
-    char * data = calloc(1000, sizeof(char));
-    int fd = open("story.txt", O_RDWR, 0666);
-    int r = read(fd, data, sizeof(data));
-    printf("The story so far:\n %s", data);
+    char data[SIZE];
+    FILE * f = fopen("story", "r");
+    if (f == NULL){
+        printf("ERROR: Story does not exist.\n");
+        return 1;
+    }
+    printf("The story so far:\n");
+    while (fgets(data, SIZE, f) != NULL) printf("%s", data);
+    fclose(f);
     shmctl(shmd, IPC_RMID, 0);
     semctl(semd, IPC_RMID, 0);
-    remove("story.txt");
+    remove("story");
   }
   else if (strcmp(flag, "-v") == 0) {
-    char * data = calloc(1000, sizeof(char));
-    int fd = open("story.txt", O_RDONLY, 0666);
-    int r = read(fd, data, sizeof(data));
-    printf("The story so far:\n%s", data);
-    free(data);
+    char data[SIZE];
+    FILE * f = fopen("story", "r");
+    if (f == NULL){
+        printf("ERROR: Story does not exist.\n");
+        return 1;
+    }
+    printf("The story so far:\n");
+    while (fgets(data, SIZE, f) != NULL) printf("%s", data);
+    fclose(f);
   }
   return 0;
 }
