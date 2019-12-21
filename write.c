@@ -28,6 +28,7 @@ int writ() {
     printf("WRITE errno: %d, error message: %s", errno, strerror(errno));
     return errno;
   }
+  strcpy(data, input);
   shmdt(data);
   semop(semd, &sb, 1);
   sb.sem_op = 1;

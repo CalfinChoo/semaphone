@@ -1,9 +1,9 @@
 #include "semaphone.h"
 
-int control(char ** flag);
 int shmd, semd;
 union semun su;
 struct sembuf sb;
+int control(char ** flag);
 
 int main(int argc, char *argv[]) {
   s.val = 1;
@@ -39,7 +39,6 @@ int control(char * flag) {
     printf("The story so far:\n %s", data);
     shmctl(shmd, IPC_RMID, 0);
     semctl(semd, IPC_RMID, 0);
-    }
   }
   else if (strcmp(flag, "-v") == 0) {
     char * data = calloc(1000, sizeof(char));

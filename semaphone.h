@@ -8,15 +8,14 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#define KEY 12345
+#include <fcntl.h>
+#include <sys/sem.h>
+#define KEY 1234
 #endif
 
 union semun {
-	Int val;		// Value for SETVAL
-	Struct semid_ds *buf;		//Buffer for IPC_STAT, IPC_SET
-	Unsigned short *array;	//Array for GETALL, SETALL
-	Struct seminfo *__buf;	//Buffer for IPC_INFO (Linux-specific)
+	int val;		// Value for SETVAL
+	struct semid_ds *buf;		//Buffer for IPC_STAT, IPC_SET
+	unsigned short *array;	//Array for GETALL, SETALL
+	struct seminfo *__buf;	//Buffer for IPC_INFO (Linux-specific)
 };
-
-int control(char ** flag);
-int write();
