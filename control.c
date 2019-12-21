@@ -1,11 +1,9 @@
 #include "semaphone.h"
 
-int shmd, semd;
-union semun su;
-struct sembuf sb;
-int control(char * flag);
-
 int main(int argc, char *argv[]) {
+  int shmd, semd;
+  union semun su;
+  struct sembuf sb;
   su.val = 1;
   sb.sem_num = 0;
   sb.sem_op = -1;
@@ -13,11 +11,7 @@ int main(int argc, char *argv[]) {
     printf("ERROR: You need to include a flag.\n");
     return 0;
   }
-  else control(argv[1]);
-  return 0;
-}
-
-int control(char * flag) {
+  char * flag = argv[1];
   if (strcmp(flag, "-c") == 0) {
     semd = semget(KEY, 1, IPC_CREAT | 0644);
     if(semd < 0){

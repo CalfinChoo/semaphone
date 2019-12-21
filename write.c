@@ -1,19 +1,11 @@
 #include "semaphone.h"
 
-int writ();
-int shmd, semd;
-struct sembuf sb;
-
-
 int main() {
+  int shmd, semd;
+  struct sembuf sb;
   sb.sem_num = 0;
   sb.sem_op = -1;
   printf("trying to get in...\n");
-  writ();
-  return 0;
-}
-
-int writ() {
   semd = semget(KEY, 1, 0);
   if(semd < 0){
    printf("ERROR: %s\n", strerror(errno));
