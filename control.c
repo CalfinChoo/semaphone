@@ -15,13 +15,14 @@ int main(int argc, char *argv[]) {
   if (strcmp(flag, "-c") == 0) {
     semd = semget(KEY, 1, IPC_CREAT | 0644);
     if(semd < 0){
-     printf("ERROR: %s\n", strerror(errno));
+     printf("ERROR1: %s\n", strerror(errno));
      return 1;
     }
     printf("semaphore created\n");
+    semctl(semd, 0, SETVAL, su);
     shmd = shmget(IPC_PRIVATE, sizeof(char *), IPC_CREAT | 0644);
     if(shmd < 0){
-     printf("ERROR: %s\n", strerror(errno));
+     printf("ERROR2: %s\n", strerror(errno));
      return 1;
     }
     printf("shared memory created\n");
@@ -32,13 +33,13 @@ int main(int argc, char *argv[]) {
   else if (strcmp(flag, "-r") == 0) {
     semd = semget(KEY, 1, 0);
     if(semd < 0){
-     printf("ERROR: %s\n", strerror(errno));
+     printf("ERROR1: %s\n", strerror(errno));
      return 1;
     }
     semop(semd, &sb, 1);
     shmd = shmget(KEY, sizeof(char *), 0);
     if(shmd < 0){
-     printf("ERROR: %s\n", strerror(errno));
+     printf("ERROR2: %s\n", strerror(errno));
      return 1;
     }
     char * data = calloc(1000, sizeof(char));

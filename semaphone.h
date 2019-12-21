@@ -10,7 +10,8 @@
 #include <sys/shm.h>
 #include <fcntl.h>
 #include <sys/sem.h>
-#define IPC_KEY 1234
+#define KEY 1234
+#define SIZE 400
 union semun {
 	int val;		// Value for SETVAL
 	struct semid_ds *buf;		//Buffer for IPC_STAT, IPC_SET
