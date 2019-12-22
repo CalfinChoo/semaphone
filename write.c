@@ -1,11 +1,18 @@
 #include "semaphone.h"
 
+int shmd, semd;
+struct sembuf sb;
+int writ();
+
 int main() {
-  int shmd, semd;
-  struct sembuf sb;
   sb.sem_num = 0;
   sb.sem_op = -1;
-  printf("trying to get in...\n");
+  writ();
+  return 0;
+}
+
+int writ() {
+ printf("trying to get in...\n");
   semd = semget(KEY, 1, 0);
   if(semd < 0){
    printf("ERROR: %s\n", strerror(errno));
@@ -33,7 +40,7 @@ int main() {
   fclose(f);
   strcpy(data, input);
  if(shmdt(data) < 0){
-    printf("ERROR! Couldn't detatch shared memory segment: %s\n", strerror(errno));
+    printf("ERROR: %s\n", strerror(errno));
     return 1;
   }
   sb.sem_op = 1;
